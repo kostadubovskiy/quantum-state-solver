@@ -88,7 +88,7 @@ class Validate(Hamiltonian):
         self.numeric_energies, self.eigenvectors = self.solve()
         
         # 2. Get analytic solution
-        self.analytic_energies = self.analytic_func(self.num_states, self.L, self.m)
+        self.analytic_energies = self.analytic_func(self.num_states, self.L, self.mass)
         
         print("\n--- Validation Results ---")
         print(f"{'State (i)':<10} | {'Numeric E':<15} | {'Analytic E':<15} | {'% Error':<10}")

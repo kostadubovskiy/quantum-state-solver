@@ -12,7 +12,7 @@ BOHR_TO_ANGSTROM = 0.529177
 HARTREE_TO_EV = 27.211386
 
 class Hamiltonian:
-    def __init__(self, N, L, potential_func, ndim, num_states, bc='dirichlet'):
+    def __init__(self, N, L, potential_func, ndim, num_states, mass = 'm_e', bc='dirichlet'):
         """
         N: Number of grid points
         L: Physical length of space in ATOMIC UNITS (Bohr radii)
@@ -26,7 +26,7 @@ class Hamiltonian:
         self.potential_func = potential_func
         self.ndim = ndim
         self.num_states = num_states
-        self.m = m_e
+        self.mass = m_e
         self.bc = bc
         self.analytic_energies = None
         
@@ -45,7 +45,7 @@ class Hamiltonian:
             z = np.linspace(0, L, N)
             self.X, self.Y, self.Z = np.meshgrid(x, y, z, indexing='ij')
         
-        self.dx = x[1] - x[0]
+        self.dx = L / (N-1)
         self.V = self.potential_matrix()
         self.T = self.kinetic_matrix()
 
@@ -65,7 +65,7 @@ class Hamiltonian:
     def kinetic_matrix(self):
         N = self.N
         dx = self.dx
-        coeff = -1.0 / (2.0 * self.m * dx**2)
+        coeff = -1.0 / (2.0 * self.mass * dx**2)
 
         main = -2.0 * np.ones(N)
         off = 1.0 * np.ones(N-1)
