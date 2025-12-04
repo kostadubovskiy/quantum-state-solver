@@ -5,36 +5,18 @@ import numpy as np
 
 
 class Validate(Hamiltonian):
-    """provide a test_case string
-    (e.g., "box_1d", "qho_3d") and it sets up
-    the potential, analytic solution, and dimension.
-    """
-
-    def __init__(
-        self, test_case, N, L, num_states, mass: MassType = MassType.ELECTRON, **kwargs
-    ):
-        """
+    def __init__(self, test_case, N, L, num_states, mass='electron'):
+        """ 
         Args:
-            test_case (str): The name of the test case.
-                             Valid options: "box_1d", "qho_1d",
-                                           "box_2d", "qho_2d",
-                                           "box_3d", "qho_3d"
-            N (int): Number of grid points per dimension
-            L (float): Length of the box in Bohr
-            num_states (int): Number of states to solve for
-            mass (MassType): Electron or Proton
-            **kwargs: Additional parameters, e.g., k=1.0 for QHO
-        """
+            test_case options: "box_1d", "qho_1d","box_2d", "qho_2d","box_3d", "qho_3d" """
+        
         self.test_case = test_case
-        self.k = kwargs.get("k", 1.0)  # Get k, default to 1.0
-
-        # 1. Determine ndim, potential, and analytic functions
-        #    based on the test_case string
-
-        if test_case == "box_1d":
+        self.k = 1
+        
+        if test_case == 'box_1d':
             ndim = 1
-            potential_func = p.V_box_1D_AU
-            self.analytic_func = p.E_box_1D_analytic_AU
+            potential_func = V_box_1D
+            self.analytic_func = E_box_1D_analytic
             self.test_case_name = "1D Particle in a Box"
 
         elif test_case == "qho_1d":
