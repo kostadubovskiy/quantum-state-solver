@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
 from Hamiltonian import Hamiltonian
-from time_evolution import Split_Operator
+from time_evolution import Split_Operator, Simple_Unitary_Time_Evolution
 
 
 class Visualize:
     def __init__(
         self,
         hamiltonian: Hamiltonian,
-        time_evolver: Split_Operator | None = None,
+        time_evolver: Split_Operator | Simple_Unitary_Time_Evolution | None = None,
         states_to_plot: int = 3,
     ):
         # Store the hamiltonian and its results
@@ -170,16 +170,20 @@ class Visualize:
         self.times = []
         self.prob_densities = []
 
-        psi = psi0.copy()  # time evolving wavefunction
+        psi_t = psi0.copy()  # time evolving wavefunction
 
         # Run evolution and collect snapshots
         for n in range(steps):
-            psi = self.time_evolver.step(psi)
+            if isinstance(self.time_evolver, Simple_Unitary_Time_Evolution):
+                t = n * self.time_evolver.dt  # Accumulated time
+                psi_t = self.time_evolver.psi_t(psi0, t=t)
+            else:
+                psi_t = self.time_evolver.step(psi_t)
 
             if n % snapshot_interval == 0:
-                self.snapshots.append(psi.copy())
+                self.snapshots.append(psi_t.copy())
                 self.times.append(n * self.time_evolver.dt)
-                self.prob_densities.append(np.abs(psi) ** 2)
+                self.prob_densities.append(np.abs(psi_t) ** 2)
 
         self.times = np.array(self.times)
         self.prob_densities = np.array(self.prob_densities)
