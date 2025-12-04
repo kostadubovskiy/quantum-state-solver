@@ -117,7 +117,6 @@ class Validate(Hamiltonian):
 
     def plot_test(self, states_to_plot=3):
         if not hasattr(self, "numeric_energies"):
-            # Make sure this matches your solve method name
             print("Error: Must run .valid_solve() before plotting.")
             return
         vis = Visualize(self, states_to_plot=states_to_plot)

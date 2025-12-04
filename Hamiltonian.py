@@ -112,6 +112,17 @@ class Hamiltonian:
         H = self.T + self.V
         # Eigenvalues will be in Hartrees
         eigenvalues, eigenvectors = eigsh(H, k=self.num_states, which="SA")
+
+        # We want continuous normalization
+        if self.ndim == 1:
+            norm_factor = 1.0 / np.sqrt(self.dx)
+        elif self.ndim == 2:
+            norm_factor = 1.0 / self.dx
+        elif self.ndim == 3:
+            norm_factor = 1.0 / (self.dx ** (3.0 / 2.0))
+
+        eigenvectors = eigenvectors * norm_factor
+
         self.numeric_energies = eigenvalues
         self.eigenvectors = eigenvectors
         return eigenvalues, eigenvectors
