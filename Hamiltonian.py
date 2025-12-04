@@ -38,8 +38,7 @@ class Hamiltonian:
         """
         inputs:
         N: Number of grid points
-        L: Physical length of space in ATOMIC UNITS (Bohr radii)
-        potential_func: Function that returns potential in ATOMIC UNITS (Hartrees)
+        L: Physical length (Bohr radii)
         ndim: 1, 2, or 3
         num_states: Number of eigenvalues to find
         m: MassType.ELECTRON or MassType.PROTON
@@ -48,7 +47,7 @@ class Hamiltonian:
         various properties of our system for the Hamiltonian
         """
         self.N = N
-        self.L = L  # L, dx is in Bohr
+        self.L = L
         self.potential_func = potential_func
         self.ndim = ndim
         self.num_states = num_states
@@ -74,7 +73,6 @@ class Hamiltonian:
         self.T = self.kinetic_matrix()
 
     def potential_matrix(self):
-        # grid in Bohr, energy in Hartrees
         if self.ndim == 1:
             Vgrid = self.potential_func(self.X, L=self.L)
         elif self.ndim == 2:
@@ -93,13 +91,14 @@ class Hamiltonian:
         main = -2.0 * np.ones(N)
         off = 1.0 * np.ones(N - 1)
 
-        Lap = diags([off, main, off], [-1, 0, 1], shape=(N, N), format="lil")
+        Lap = diags(
+            [off, main, off], [-1, 0, 1], shape=(N, N), format="csr"
+        )  # csr for better access to rows
 
         if self.bc == "periodic":
+            # getting laplacian to wrap around
             Lap[0, -1] = 1.0
             Lap[-1, 0] = 1.0
-
-        Lap = Lap.tocsr()
 
         I = eye(N, format="csr")
 

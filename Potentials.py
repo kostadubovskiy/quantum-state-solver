@@ -5,7 +5,6 @@ from Hamiltonian import MassType
 m_e = 1.0
 m_p = 1836.15267343
 
-# 1D TEST CASES
 
 
 def V_box_1D_AU(x, L=None):
@@ -27,7 +26,7 @@ def E_qho_1D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON, k=1.0)
     n = np.arange(0, n_states)
     energies = (n + 0.5) * np.sqrt(k / mass)
     return energies
-
+  
 
 # 2D TEST CASES
 
@@ -50,7 +49,6 @@ def E_box_2D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON):
             energies.append(E)
     energies.sort()
     return np.array(energies[:n_states])
-
 
 def E_qho_2D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON, k=1.0):
     # L is ignored for analytic formula
