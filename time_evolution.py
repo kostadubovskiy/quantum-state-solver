@@ -83,6 +83,6 @@ class Simple_Unitary_Time_Evolution:
         # Time evolve coefficients: c_n(t) = c_n(0) * exp(-i E_n t)
         c_t = c * np.exp(-1j * self.eigenvalues * t)
 
-        # Reconstruct wavefunction: ψ(t) = Σ_n c_n(t) * eigenstate_n
+        # Reconstruct wavefunction: psi(t) = sum _n c_n(t) * eigenstate_n
         psi_t = np.dot(self.eigenstates, c_t)
         return psi_t
