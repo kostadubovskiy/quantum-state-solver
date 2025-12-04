@@ -33,42 +33,42 @@ class Hamiltonian:
         ndim,
         num_states,
         mass: MassType = MassType.ELECTRON,
-        bc="dirichlet",
     ):
         """
         inputs:
-        N: Number of grid points
-        L: Physical length (Bohr radii)
+        N: Number of grid points, power of 2 is good for fft
+        L: Physical length (Bohr radii) should be around 20
         ndim: 1, 2, or 3
         num_states: Number of eigenvalues to find
-        m: MassType.ELECTRON or MassType.PROTON
+        mass: MassType.ELECTRON or MassType.PROTON
 
         sets:
         various properties of our system for the Hamiltonian
         """
         self.N = N
+        self.N_interior = N-1
         self.L = L
         self.potential_func = potential_func
         self.ndim = ndim
         self.num_states = num_states
         self.mass = get_mass(mass)
-        self.bc = bc
         self.analytic_energies = None
 
         # x, y, z are all in Bohr
-        x = np.linspace(0, L, N)
-
+        x = np.linspace(0, L, N, endpoint=False) #periodic grid like for split op
+        x_interior = x[1:] #only interior pts for dirichlet solver cuz we force psi at 0,L to be 0
+        self.dx = L/N
+        
         if ndim == 1:
-            self.X = x
+            self.X = x_interior
         elif ndim == 2:
-            y = np.linspace(0, L, N)
+            y = x_interior
             self.X, self.Y = np.meshgrid(x, y, indexing="ij")
         elif ndim == 3:
-            y = np.linspace(0, L, N)
-            z = np.linspace(0, L, N)
+            y = x_interior
+            z = x_interior
             self.X, self.Y, self.Z = np.meshgrid(x, y, z, indexing="ij")
 
-        self.dx = L / (N - 1)
         self.V = self.potential_matrix()
         self.T = self.kinetic_matrix()
 
@@ -80,31 +80,26 @@ class Hamiltonian:
         elif self.ndim == 3:
             Vgrid = self.potential_func(self.X, self.Y, self.Z, L=self.L)
 
-        V_flat = Vgrid.reshape(self.N**self.ndim)
+        V_flat = Vgrid.reshape(self.N_interior**self.ndim)
         return diags(V_flat, 0, format="csr")
 
     def kinetic_matrix(self):
-        N = self.N
+        #building finite difference kinetic energy operator T = -ihbar/2m * p**2
         dx = self.dx
+        
         coeff = -1.0 / (2.0 * self.mass * dx**2)
-
-        main = -2.0 * np.ones(N)
-        off = 1.0 * np.ones(N - 1)
+        main = -2.0 * np.ones(self.N_interior)
+        off = 1.0 * np.ones(self.N_interior - 1)
 
         Lap = diags(
-            [off, main, off], [-1, 0, 1], shape=(N, N), format="csr"
+            [off, main, off], [-1, 0, 1], shape=(self.N_interior, self.N_interior), format="csr"
         )  # csr for better access to rows
 
-        if self.bc == "periodic":
-            # getting laplacian to wrap around
-            Lap[0, -1] = 1.0
-            Lap[-1, 0] = 1.0
-
-        I = eye(N, format="csr")
+        I = eye(self.N_interior, format="csr")
 
         if self.ndim == 1:
             K = coeff * Lap
-
+        #use kron to upgrade laplacian to higher dimension
         elif self.ndim == 2:
             K = coeff * (kron(Lap, I) + kron(I, Lap))
 
@@ -117,22 +112,16 @@ class Hamiltonian:
 
     def solve(self):
         H = self.T + self.V
-        # Eigenvalues will be in Hartrees
-        eigenvalues, eigenvectors = eigsh(H, k=self.num_states, which="SA")
+        # Eigenvalues will be in Hartrees, SA smallest algebraic eigenvalue, sigma tells it where to start looking for eigenvalues
+        eigenvalues, eigenvectors = eigsh(H, k=self.num_states, which="SA", sigma=0)
 
         # We want continuous normalization
-        if self.ndim == 1:
-            norm_factor = 1.0 / np.sqrt(self.dx)
-        elif self.ndim == 2:
-            norm_factor = 1.0 / self.dx
-        elif self.ndim == 3:
-            norm_factor = 1.0 / (self.dx ** (3.0 / 2.0))
-
-        eigenvectors = eigenvectors * norm_factor
+        norm_factor = 1.0 / (self.dx ** (self.ndim / 2.0))
 
         self.numeric_energies = eigenvalues
-        self.eigenvectors = eigenvectors
+        self.eigenvectors = eigenvectors* norm_factor
         return eigenvalues, eigenvectors
 
     def set_analytic_energies(self, energies):
+        #for when we validate
         self.analytic_energies = np.array(energies)
