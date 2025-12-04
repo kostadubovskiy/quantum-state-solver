@@ -15,6 +15,15 @@ class MassType(Enum):
     PROTON = "proton"
 
 
+def get_mass(mass: MassType) -> float | None:
+    if mass == MassType.ELECTRON:
+        return Constants.ELECTRON_MASS.value
+    elif mass == MassType.PROTON:
+        return Constants.PROTON_MASS.value
+    else:
+        return None
+
+
 class Hamiltonian:
     def __init__(
         self,
@@ -27,22 +36,22 @@ class Hamiltonian:
         bc="dirichlet",
     ):
         """
+        inputs:
         N: Number of grid points
         L: Physical length (Bohr radii)
         ndim: 1, 2, or 3
-        num_states: Number of eigenvalues to find """
-        
+        num_states: Number of eigenvalues to find
+        m: MassType.ELECTRON or MassType.PROTON
+
+        sets:
+        various properties of our system for the Hamiltonian
+        """
         self.N = N
-        self.L = L 
+        self.L = L
         self.potential_func = potential_func
         self.ndim = ndim
         self.num_states = num_states
-        if mass == MassType.ELECTRON:
-            self.mass = Constants.ELECTRON_MASS.value
-        elif mass == MassType.PROTON:
-            self.mass = Constants.PROTON_MASS.value
-        else:
-            raise ValueError(f"Invalid mass: {mass}")
+        self.mass = get_mass(mass)
         self.bc = bc
         self.analytic_energies = None
 
@@ -64,7 +73,6 @@ class Hamiltonian:
         self.T = self.kinetic_matrix()
 
     def potential_matrix(self):
-        
         if self.ndim == 1:
             Vgrid = self.potential_func(self.X, L=self.L)
         elif self.ndim == 2:
@@ -83,10 +91,12 @@ class Hamiltonian:
         main = -2.0 * np.ones(N)
         off = 1.0 * np.ones(N - 1)
 
-        Lap = diags([off, main, off], [-1, 0, 1], shape=(N, N), format='csr') #csr for better access to rows
+        Lap = diags(
+            [off, main, off], [-1, 0, 1], shape=(N, N), format="csr"
+        )  # csr for better access to rows
 
         if self.bc == "periodic":
-            #getting laplacian to wrap around
+            # getting laplacian to wrap around
             Lap[0, -1] = 1.0
             Lap[-1, 0] = 1.0
 
