@@ -27,8 +27,8 @@ def get_mass(mass: MassType) -> float | None:
 class Hamiltonian:
     def __init__(
         self,
-        N,
-        L,
+        N: int,
+        L: float | int,
         potential_func,
         ndim,
         num_states,
@@ -54,6 +54,9 @@ class Hamiltonian:
         self.mass = get_mass(mass)
         self.bc = bc
         self.analytic_energies = None
+        self.numeric_energies = None
+        self.eigenvectors = None
+        self.test_case_name = None
 
         # x, y, z are all in Bohr
         x = np.linspace(0, L, N)
