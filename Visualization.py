@@ -86,38 +86,38 @@ class Visualize:
             )
 
             if self.ndim == 1:
-                ax1.plot(grid, psi, label="Wavefunction $\psi$")
-                ax1.set_title("Wavefunction ($\psi$)")
+                ax1.plot(grid, psi, label=r"Wavefunction $\psi$")
+                ax1.set_title(r"Wavefunction ($\psi$)")
                 ax1.set_xlabel("x (Bohr)")
-                ax1.set_ylabel("$\psi(x)$")
+                ax1.set_ylabel(r"$\psi(x)$")
                 ax1.grid(True)
 
                 ax2.plot(
                     grid,
                     prob_density,
-                    label="Probability Density $|\psi|^2$",
+                    label=r"Probability Density $|\psi^{2}|$",
                     color="r",
                 )
                 ax2.fill_between(grid, prob_density, color="red", alpha=0.3)
-                ax2.set_title("Probability Density ($|\psi|^2$)")
+                ax2.set_title(r"Probability Density ($|\psi^{2}|$)")
                 ax2.set_xlabel("x (Bohr)")
-                ax2.set_ylabel("$|\psi(x)|^2$")
+                ax2.set_ylabel(r"$|\psi(x)|^2$")
                 ax2.grid(True)
 
             elif self.ndim == 2 or self.ndim == 3:
                 im1 = ax1.imshow(psi.T, extent=extent, cmap="seismic", origin="lower")
-                ax1.set_title("Wavefunction ($\psi$)")
+                ax1.set_title(r"Wavefunction ($\psi$)")
                 ax1.set_xlabel("x (Bohr)")
                 ax1.set_ylabel("y (Bohr)")
-                fig.colorbar(im1, ax=ax1, label="$\psi$")
+                fig.colorbar(im1, ax=ax1, label=r"$\psi$")
 
                 im2 = ax2.imshow(
                     prob_density.T, extent=extent, cmap="viridis", origin="lower"
                 )
-                ax2.set_title("Probability Density ($|\psi|^2$)")
+                ax2.set_title(r"Probability Density ($|\psi^{2}|$)")
                 ax2.set_xlabel("x (Bohr)")
                 ax2.set_ylabel("y (Bohr)")
-                fig.colorbar(im2, ax=ax2, label="$|\psi|^2$")
+                fig.colorbar(im2, ax=ax2, label=r"$|\psi^{2}|$")
 
             plt.tight_layout()
             plt.show()
@@ -247,7 +247,7 @@ class Visualize:
             ax.set_title(title)
             ax.set_xlabel("x (Bohr)" if slice_axis != "x" else "y (Bohr)")
             ax.set_ylabel("y (Bohr)" if slice_axis == "z" else "z (Bohr)")
-            plt.colorbar(im, ax=ax, label="$|\psi|^2$")
+            plt.colorbar(im, ax=ax, label=r"$|\psi^{2}|$")
 
         # Hide unused subplots
         for idx in range(n_slices, len(axes)):
@@ -295,7 +295,7 @@ class Visualize:
         ax.set_title(
             f"Volume Rendering - State {state_idx} (E = {self.numeric_energies[state_idx]:.4f} Hartrees)"
         )
-        plt.colorbar(scatter, ax=ax, label="$|\psi|^2$")
+        plt.colorbar(scatter, ax=ax, label=r"$|\psi^{2}|$")
         plt.show()
 
     def animate_3d_slices(self, state_idx, slice_axis="z", fps=30, save_path=None):
@@ -355,7 +355,7 @@ class Visualize:
         )
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        plt.colorbar(im, ax=ax, label="$|\psi|^2$")
+        plt.colorbar(im, ax=ax, label=r"$|\psi^{2}|$")
 
         title = ax.set_title(
             f"State {state_idx} - Slice {slice_axis}[0] = {0:.2f} Bohr"
@@ -450,7 +450,7 @@ class Visualize:
         )
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        plt.colorbar(im, ax=ax, label="$|\psi|^2$")
+        plt.colorbar(im, ax=ax, label=r"$|\psi^{2}|$")
 
         title = ax.set_title(f"Time Evolution - t = {times[0]:.4f} a.u.")
 

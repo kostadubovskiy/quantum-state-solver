@@ -15,6 +15,15 @@ class MassType(Enum):
     PROTON = "proton"
 
 
+def get_mass(mass: MassType) -> float | None:
+    if mass == MassType.ELECTRON:
+        return Constants.ELECTRON_MASS.value
+    elif mass == MassType.PROTON:
+        return Constants.PROTON_MASS.value
+    else:
+        return None
+
+
 class Hamiltonian:
     def __init__(
         self,
@@ -27,24 +36,23 @@ class Hamiltonian:
         bc="dirichlet",
     ):
         """
+        inputs:
         N: Number of grid points
         L: Physical length of space in ATOMIC UNITS (Bohr radii)
         potential_func: Function that returns potential in ATOMIC UNITS (Hartrees)
         ndim: 1, 2, or 3
         num_states: Number of eigenvalues to find
-        mass: 'electron' or 'proton'
+        m: MassType.ELECTRON or MassType.PROTON
+
+        sets:
+        various properties of our system for the Hamiltonian
         """
         self.N = N
         self.L = L  # L, dx is in Bohr
         self.potential_func = potential_func
         self.ndim = ndim
         self.num_states = num_states
-        if mass == MassType.ELECTRON:
-            self.mass = Constants.ELECTRON_MASS.value
-        elif mass == MassType.PROTON:
-            self.mass = Constants.PROTON_MASS.value
-        else:
-            raise ValueError(f"Invalid mass: {mass}")
+        self.mass = get_mass(mass)
         self.bc = bc
         self.analytic_energies = None
 
