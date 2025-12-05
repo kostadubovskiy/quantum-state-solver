@@ -14,8 +14,8 @@ def V_qho_1D_AU(x, L=None, k=1.0):
     return 0.5 * k * ((x - L / 2) ** 2)
 
 
-def V_qho_1D_perturbed(x, L=None, k=1.0):
-    return 0.5 * k * ((x - L / 2) ** 2) + (x - L / 2) ** 5
+def V_qho_1D_perturbed(x, L=None, k=1.0, lambda_perturbed=0.01):
+    return 0.5 * k * ((x - L / 2) ** 2) + lambda_perturbed * (x - L / 2) ** 5
 
 
 def E_box_1D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON):
