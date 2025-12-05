@@ -6,13 +6,16 @@ m_e = 1.0
 m_p = 1836.15267343
 
 
-
 def V_box_1D_AU(x, L=None):
     return np.zeros_like(x)
 
 
 def V_qho_1D_AU(x, L=None, k=1.0):
     return 0.5 * k * ((x - L / 2) ** 2)
+
+
+def V_qho_1D_perturbed(x, L=None, k=1.0):
+    return 0.5 * k * ((x - L / 2) ** 2) + (x - L / 2) ** 5
 
 
 def E_box_1D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON):
@@ -26,7 +29,7 @@ def E_qho_1D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON, k=1.0)
     n = np.arange(0, n_states)
     energies = (n + 0.5) * np.sqrt(k / mass)
     return energies
-  
+
 
 # 2D TEST CASES
 
@@ -49,6 +52,7 @@ def E_box_2D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON):
             energies.append(E)
     energies.sort()
     return np.array(energies[:n_states])
+
 
 def E_qho_2D_analytic_AU(n_states, L, mass: MassType = MassType.ELECTRON, k=1.0):
     # L is ignored for analytic formula

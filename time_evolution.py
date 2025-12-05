@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
-from Hamiltonian import Constants
+
+# would be saucy to have a parent class TimeEvolver or something... welp no time.
 
 
 class Split_Operator:
@@ -22,17 +23,10 @@ class Split_Operator:
 
         # time evolution exponentials
         self.V_half = np.exp(-0.5j * self.V * dt)
-        self.T = np.exp(-1j * (self.k**2) * dt / (2 * mass))
+        self.T = np.exp(-1j * (self.k**2) * dt / (2 * mass))  # initial kinetic energy
 
         # absorbing mask for absorbing boundaries
         self.mask = np.ones_like(self.x)
-
-    def absorbing_boundary(self, start_frac=0.8, p=6):
-        """smooth mask (0 < mask <= 1) for absorbing outgoing waves."""
-        x0 = start_frac * self.L
-        idx = self.x > x0
-        scaled = (self.x[idx] - x0) / (self.L - x0)
-        self.mask[idx] = np.exp(-(scaled**p))
 
     def step(self, psi):
         # split operator algo
